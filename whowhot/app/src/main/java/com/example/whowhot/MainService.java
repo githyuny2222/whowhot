@@ -46,8 +46,8 @@ public class MainService extends Service {
 
         String[] msgs = intent.getStringArrayExtra("msgs"); // 브로드캐스트 리시버에서 메시지 받음
         if(msgs != null) {
-            //Log.d(TAG, "sender :" +msgs[0]);
-            //Log.d(TAG, "content :" +msgs[1]);
+            Log.d(TAG, "sender :" +msgs[0]);
+            Log.d(TAG, "content :" +msgs[1]);
             checkMessageAndNotify(getApplicationContext(), msgs);
         }
         return START_NOT_STICKY;
@@ -99,7 +99,7 @@ public class MainService extends Service {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     UrlData currData = postSnapshot.getValue(UrlData.class);
                     String currURL = currData.getURL();
-                    Log.d(TAG, "currURL : "+currURL);
+                    //Log.d(TAG, "currURL : "+currURL);
 
                     if (targetURL.equals(currURL)) {
                         Log.d(TAG, "블랙리스트에서 발견");
@@ -222,22 +222,24 @@ public class MainService extends Service {
         }
 
         /* 메시지 내용 검사 */
-        danger += checkSafeContent();
+        danger += checkSafeContent(content);
 
         /* 위험도에 따라 사용자에게 알림 */
-        notify(context, danger, sender, content);
+        notify(context, danger, sender, targetURL);
     }
 
-    public int checkSafeContent(){
+    /* 메시지 내용 검사하는 함수(공공기관 사칭 메시지 등) */
+    public int checkSafeContent(String content){
         int danger = 0;
-        if(contentTest1()){ danger += 1; }
-        if(contentTest2()){ danger += 1; }
+        if(contentTest1(content)){ danger += 1; }
+        if(contentTest2(content)){ danger += 1; }
 
         return danger;
     }
 
-    public boolean contentTest1() { return false; }
-    public boolean contentTest2() { return false; }
+    /* 메시지 String에서 위험도 판별하는 알고리즘 함수 예시 */
+    public boolean contentTest1(String content) { return false; }
+    public boolean contentTest2(String content) { return false; }
 
     /* Dialog 호출 */
     public void callDialog(Context context, int danger){
