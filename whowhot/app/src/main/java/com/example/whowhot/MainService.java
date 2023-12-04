@@ -26,9 +26,12 @@ import java.util.regex.Pattern;
 
 public class MainService extends Service {
     private static final String TAG = "TEST_MAIN_SERVICE";   // log용 태그
-    private static final String fileName = "log.txt";    // 로그 저장 파일 이름
+    private static final String logfileName = "log.txt";    // 로그 저장 파일 이름
     private static final String[] domainFilter = {".com", ".net", ".kr", ".org", ".us"};    // 도메인 검사용
     private static final String REGEX ="(http(s)?:\\/\\/|www.)?(([a-z0-9\\w])(\\.*))+[a-z-]{2,4}([\\/a-z0-9-%#º@?&=+\\w])+(\\.[a-z\\/]{2,4}(\\?[\\/a-z0-9-@%#?&=\\w]+)*)?([가-힣])*";
+    private static final String phoneREGEX = "\\b(\\+?[0-9]+[-.\\s]?\\(?[0-9]+\\)?[-.\\s]?[0-9]+[-.\\s]?[0-9]+[-.\\s]?[0-9]+)\\b";
+    private static final String[] msgCardFilter = { "BC카드", "KB국민카드", "NH농협카드", "롯데카드", "삼성카드",
+            "신한카드", "우리카드", "하나카드", "현대카드" };
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Data");
@@ -80,6 +83,7 @@ public class MainService extends Service {
 
     /* URL 화이트리스트 검사 */
     public boolean isWhite(String targetURL) {
+        loadWhiteListFromFile();
         return false;
     }
 
@@ -131,6 +135,47 @@ public class MainService extends Service {
         checkBlacklist(context, targetURL);
 
         return false;
+    }
+
+    /* 메시지에서 전화번호 파싱 */
+    public String parsePhone(String content){
+        Pattern pattern = Pattern.compile(phoneREGEX);
+        Matcher phoneMatcher = pattern.matcher(content);
+        if (phoneMatcher.find()){
+            return phoneMatcher.group();
+        }
+        else
+            return "";
+    }
+
+    /* 메시지 String에서 위험도 판별하는 알고리즘 함수 예시 */
+    public boolean contentTest1(String content) { return false; }
+    public boolean contentTest2(String content) { return false; }
+    public boolean isNormalCardMsg(String content , String targetPhone) {
+        if (targetPhone != null) {  // 메시지에 전화번호가 존재하면
+            for (String c : msgCardFilter) {
+                if (content.contains(c)) { //카드 관련 문자 발견
+                    Log.d(TAG, "Card found: " + "'" + c + "'");
+                    return true;
+                } else {
+                    //Log.d(TAG, c + " Not exist");
+                    continue;
+                }
+            }
+        }
+        return false;
+    };
+
+    /* 메시지 내용 검사하는 함수(공공기관 사칭 메시지 등) */
+    public int checkSafeContent(String content, String sender, String targetPhone){
+        int danger = 0;
+        if(contentTest1(content)){ danger += 1; }
+        if(contentTest2(content)){ danger += 1; }
+
+        // 카드사가 포함된 문자 모두 거름
+        //if(isNormalCardMsg(content, targetPhone)) { danger += 1; }
+
+        return danger;
     }
 
     /* 도메인 양식 검사 */
@@ -211,35 +256,25 @@ public class MainService extends Service {
     /* 메시지 위험도 검사하고 알림 */
     private void checkMessageAndNotify(Context context, String[] message) {
         int danger = 0; // 위험도
-        String sender = message[0];  //Log.d(TAG, "sender : "+sender);
-        String content = message[1]; //Log.d(TAG, "content : "+content);
+        String sender = message[0]; // 발신자
+        String content = message[1]; // 메시지 내용
 
         /* URL 검사 */
         String targetURL = parseURL(content); // 메시지 내용에서 URL 추출
         Log.d(TAG, "targetURL : " + targetURL);
-        if(!targetURL.equals("") && !isSafeURL(context, targetURL)) { // 안전한 URL이 아니면
+        if(!targetURL.equals("") && !isSafeURL(context, targetURL)) { // (targetURL 비어있으면 실행안됨)안전한 URL이 아니면
             danger += advancedURLTest(targetURL);   // 추가 검사하고 위험도 추가
         }
 
         /* 메시지 내용 검사 */
-        danger += checkSafeContent(content);
+        String targetPhone = parsePhone(content);
+        Log.d(TAG,"Phone Num: " + targetPhone);
+        danger += checkSafeContent(content, sender, targetPhone);
 
         /* 위험도에 따라 사용자에게 알림 */
         notify(context, danger, sender, targetURL);
     }
 
-    /* 메시지 내용 검사하는 함수(공공기관 사칭 메시지 등) */
-    public int checkSafeContent(String content){
-        int danger = 0;
-        if(contentTest1(content)){ danger += 1; }
-        if(contentTest2(content)){ danger += 1; }
-
-        return danger;
-    }
-
-    /* 메시지 String에서 위험도 판별하는 알고리즘 함수 예시 */
-    public boolean contentTest1(String content) { return false; }
-    public boolean contentTest2(String content) { return false; }
 
     /* Dialog 호출 */
     public void callDialog(Context context, int danger){
@@ -262,7 +297,7 @@ public class MainService extends Service {
     private void loadWhiteListFromFile(){ //파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시
         Log.d(TAG, "Load Whitelist");
 
-        File file = new File(getFilesDir(), fileName);
+        File file = new File(getFilesDir(), "Whitelist.txt");
         FileReader fr = null;
         BufferedReader bufrd = null;
         String str;
