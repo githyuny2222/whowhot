@@ -49,8 +49,8 @@ public class MainService extends Service {
 
         String[] msgs = intent.getStringArrayExtra("msgs"); // 브로드캐스트 리시버에서 메시지 받음
         if(msgs != null) {
-            Log.d(TAG, "sender :" +msgs[0]);
-            Log.d(TAG, "content :" +msgs[1]);
+            //Log.d(TAG, "sender :" +msgs[0]);
+            //Log.d(TAG, "content :" +msgs[1]);
             checkMessageAndNotify(getApplicationContext(), msgs);
         }
         return START_NOT_STICKY;
@@ -82,8 +82,47 @@ public class MainService extends Service {
     }
 
     /* URL 화이트리스트 검사 */
-    public boolean isWhite(String targetURL) {
-        loadWhiteListFromFile();
+    private boolean isWhite(String targetURL){ //파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시
+        Log.d(TAG, "Load Whitelist");
+        boolean iswhite_flag = false;
+
+        File file = new File(getFilesDir(), "WhiteList.txt");
+        FileReader fr = null;
+        BufferedReader bufrd = null;
+        String str;
+
+        //Log.d(TAG, "AbsolutePath : "+file.getAbsolutePath());
+        //Log.d(TAG, "Path : "+file.getPath());
+        //Log.d(TAG, "Filename : "+file.getName());
+
+        if (file.exists()){ //파일이 존재하면
+            try { //open file
+                Log.d(TAG, "file open");
+                fr = new FileReader(file);
+                bufrd = new BufferedReader(fr);
+
+                while ((str = bufrd.readLine()) != null){
+                    Log.d(TAG, "WhiteList : "+str);
+                    if(targetURL.equals(str)){
+                        iswhite_flag = true;
+                        Log.d(TAG, "화이트리스트에 있는 URL");
+                        break;
+                    }
+                }
+
+                //file reader close
+                Log.d(TAG, "close file");
+                bufrd.close();
+                fr.close();
+                return iswhite_flag;
+            } catch (Exception e){
+                e.printStackTrace();
+                Log.e(TAG, "FILE ERROR : "+e);
+            }
+        }
+        else{
+            Log.d(TAG, "file don't exist");
+        }
         return false;
     }
 
@@ -125,16 +164,14 @@ public class MainService extends Service {
 
     /* URL 검사 */
     public boolean isSafeURL(Context context, String targetURL){
-        /* 먼저 화이트 리스트에 걸리는지 체크 */
-        if (isWhite(targetURL)) {
-            Log.d(TAG, "화이트 리스트에 있음 : 안전");
+        if (isWhite(targetURL)) { // 화이트리스트에 걸리면 안전
             return true;
         }
-
-        /* DB검사 */
-        checkBlacklist(context, targetURL);
-
-        return false;
+        else { // 화이트 리스트에 안걸리면
+            /* DB검사 */
+            checkBlacklist(context, targetURL);
+            return false;
+        }
     }
 
     /* 메시지에서 전화번호 파싱 */
@@ -239,6 +276,7 @@ public class MainService extends Service {
         return danger;
     }
 
+    /* 위험도 받아서 경고 다이얼로그 출력하는 함수 */
     public void notify(Context context, int danger, String phoneNumber, String targetURL){
         if (danger == 0) {
             Log.d(TAG, "위험도 0 : 가벼운 경고");
@@ -262,8 +300,14 @@ public class MainService extends Service {
         /* URL 검사 */
         String targetURL = parseURL(content); // 메시지 내용에서 URL 추출
         Log.d(TAG, "targetURL : " + targetURL);
-        if(!targetURL.equals("") && !isSafeURL(context, targetURL)) { // (targetURL 비어있으면 실행안됨)안전한 URL이 아니면
-            danger += advancedURLTest(targetURL);   // 추가 검사하고 위험도 추가
+        if(!targetURL.equals("")) { // 메시지에 URL이 존재할때
+            if (isSafeURL(context, targetURL)) { // 안전한 URL이면
+                Log.d(TAG, "안전한 URL");
+                return;
+            }
+            else{   // 안전한 URL이 아니면
+                danger += advancedURLTest(targetURL);   // 추가 검사하고 위험도 추가
+            }
         }
 
         /* 메시지 내용 검사 */
@@ -291,44 +335,6 @@ public class MainService extends Service {
         } catch (PendingIntent.CanceledException e) {
             e.printStackTrace();
             Log.e(TAG, "DIALOG Error: " + e.getMessage(), e);
-        }
-    }
-
-    private void loadWhiteListFromFile(){ //파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시
-        Log.d(TAG, "Load Whitelist");
-
-        File file = new File(getFilesDir(), "Whitelist.txt");
-        FileReader fr = null;
-        BufferedReader bufrd = null;
-        String str;
-
-        Log.d(TAG, "AbsolutePath : "+file.getAbsolutePath());
-        Log.d(TAG, "Path : "+file.getPath());
-        Log.d(TAG, "Filename : "+file.getName());
-
-        if (file.exists()){ //파일이 존재하면
-            Log.d(TAG, "file exists");
-            try { //open file
-                Log.d(TAG, "before open file");
-                fr = new FileReader(file);
-                bufrd = new BufferedReader(fr);
-
-                Log.d(TAG, "before readLine");
-                while ((str = bufrd.readLine()) != null){
-                    // 여기에 추가할 동작
-                    Log.d(TAG, str);
-                }
-                //file reader close
-                Log.d(TAG, "close file");
-                bufrd.close();
-                fr.close();
-            } catch (Exception e){
-                e.printStackTrace();
-                Log.e(TAG, "FILE ERROR : "+e);
-            }
-        }
-        else{
-            Log.d(TAG, "file don't exist");
         }
     }
 
@@ -362,6 +368,7 @@ public class MainService extends Service {
         }
     }
 
+    /* 그냥 살아있나 확인하는 쓰레드 */
     private class TestThread extends Thread {
         private static final String TAG = "TestThread";
         private int cnt = 0;
@@ -376,7 +383,7 @@ public class MainService extends Service {
                 try {
                     cnt++;
                     Thread.sleep(1000);
-                    if (cnt > 3) {
+                    if (cnt > 3) {  // 3초 지났으면 꺼짐
                         this.interrupt();
                         onDestroy();
                     }
