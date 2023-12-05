@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 public class MainService extends Service {
     private static final String TAG = "TEST_MAIN_SERVICE";   // log용 태그
     private static final String logfileName = "log.txt";    // 로그 저장 파일 이름
-    private static final String[] domainFilter = {".com", ".net", ".kr", ".org", ".us"};    // 도메인 검사용
+    private static final String[] domainFilter = {".com", ".net", ".kr", ".org", ".us", ".ng", ".biz", ".info"};    // 도메인 검사용
     private static final String REGEX ="(http(s)?:\\/\\/|www.)?(([a-z0-9\\w])(\\.*))+[a-z-]{2,4}([\\/a-z0-9-%#º@?&=+\\w])+(\\.[a-z\\/]{2,4}(\\?[\\/a-z0-9-@%#?&=\\w]+)*)?([가-힣])*";
     private static final String phoneREGEX = "\\b(\\+?[0-9]+[-.\\s]?\\(?[0-9]+\\)?[-.\\s]?[0-9]+[-.\\s]?[0-9]+[-.\\s]?[0-9]+)\\b";
     private static final String[] msgCardFilter = { "BC카드", "KB국민카드", "NH농협카드", "롯데카드", "삼성카드",

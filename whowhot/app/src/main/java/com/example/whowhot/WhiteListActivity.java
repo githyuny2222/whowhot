@@ -22,8 +22,14 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 
 public class WhiteListActivity extends Activity {
-    private final String fileName = "WhiteList.txt";    // 화이트리스트 저장 파일 이름
+    private static final String fileName = "WhiteList.txt";    // 화이트리스트 저장 파일 이름
     private static final String TAG = "TEST_WHITE";   // Log용 태그
+    private static final String[] defaultWhitelist = {"youtube.com", "google.com", "naver.com",
+            "namu.wiki", "dcinside.com", "tistory.com",
+            "coupang.com", "daum.net", "twitch.tv", "fmkorea.com",
+            "inven.co.kr", "arca.live", "kakao.com", "google.co.kr",
+            "nexon.com", "instagram.com", "aliexpress.com", "ruliweb.com",
+            "afreecatv.com", "twitter.com" };   // 화이트리스트에 2023년 가장 많이 접속된 사이트 top 20 기본 추가
 
     private Button btnAdd, btnDel, btnRet;
     private EditText urlInput;
@@ -48,7 +54,7 @@ public class WhiteListActivity extends Activity {
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         list.setAdapter(adapter);
 
-        loadWhiteListFromFile(fileName);
+        loadWhiteListFromFile();
         adapter.notifyDataSetChanged();
 
         btnAdd.setEnabled(false);
@@ -142,15 +148,19 @@ public class WhiteListActivity extends Activity {
             }
         } catch (Exception e){
             e.printStackTrace();
+            Log.d(TAG, "save file Error : "+e);
         }
     }
-    private void loadWhiteListFromFile(String fileName){ //파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시
+
+    private void loadWhiteListFromFile(){ //파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시
+        Log.d(TAG, "loadWhiteList");
         File file = new File(getFilesDir(), fileName);
         FileReader fr = null;
         BufferedReader bufrd = null;
         String str;
 
         if (file.exists()){ //파일이 존재하면
+            Log.d(TAG, "file exists!");
             try { //open file
                 fr = new FileReader(file);
                 bufrd = new BufferedReader(fr);
@@ -163,7 +173,46 @@ public class WhiteListActivity extends Activity {
                 fr.close();
             } catch (Exception e){
                 e.printStackTrace();
+                Log.d(TAG, "load file Error : "+e);
             }
+        }
+        else{
+            fillWhiteList();
+            loadWhiteListFromFile();
+        }
+    }
+
+    public void fillWhiteList(){
+        Log.d(TAG, "fillWhiteList");
+        File file = new File(getFilesDir(), fileName);
+        FileWriter fw = null;
+        BufferedWriter bufwr = null;
+
+        try { //open file
+            fw = new FileWriter(file);
+            bufwr = new BufferedWriter(fw);
+
+            for (String str : defaultWhitelist){
+                bufwr.write(str);   // 기본 화이트리스트 추가
+                bufwr.newLine();
+            }
+            //write data to the file
+            bufwr.flush();
+            Log.d(TAG, file.getAbsolutePath()+"에 저장");
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try { //close file
+            if (bufwr != null){
+                bufwr.close();
+            }
+            if (fw != null){
+                fw.close();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }
