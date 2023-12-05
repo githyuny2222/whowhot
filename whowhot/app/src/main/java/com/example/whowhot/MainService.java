@@ -36,6 +36,8 @@ public class MainService extends Service {
     private static final String phoneREGEX = "\\b(\\+?[0-9]+[-.\\s]?\\(?[0-9]+\\)?[-.\\s]?[0-9]+[-.\\s]?[0-9]+[-.\\s]?[0-9]+)\\b";
     private static final String[] msgCardFilter = { "BC카드", "KB국민카드", "NH농협카드", "롯데카드", "삼성카드",
             "신한카드", "우리카드", "하나카드", "현대카드" };
+    private static final String[][] msgCardPhone = {{"BC카드", "15884000", "15664000"}, {"KB국민카드","15881688"}, {"NH농협카드","16444000"}, {"롯데카드", "15888100"},
+            {"삼성카드", "15888700"}, {"신한카드", "15447000"}, {"우리카드", "15889955", "15999955"}, {"하나카드", "18001111"},{"현대카드", "15776000"}};
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Data");
@@ -192,30 +194,29 @@ public class MainService extends Service {
     /* 메시지 String에서 위험도 판별하는 알고리즘 함수 예시 */
     public boolean contentTest1(String content) { return false; }
     public boolean contentTest2(String content) { return false; }
-    public boolean isNormalCardMsg(String content , String targetPhone) {
-        if (targetPhone != null) {  // 메시지에 전화번호가 존재하면
-            for (String c : msgCardFilter) {
-                if (content.contains(c)) { //카드 관련 문자 발견
-                    Log.d(TAG, "Card found: " + "'" + c + "'");
-                    return true;
-                } else {
-                    //Log.d(TAG, c + " Not exist");
-                    continue;
+
+    /*발신자 전화번호가 해당 카드사가 아닌 것 판별하는 함수*/
+    public boolean isNormalCardPhone(String sender, String content){
+        for (String[] cardInfo : msgCardPhone){
+            if (content.contains(cardInfo[0])){ // 만약 문자 중에 배열에 있는 카드가 존재하면 cardInfo[0]에 포함
+                Log.d(TAG,"카드 발견: " + cardInfo[0]);
+                for (String phoneInfo : cardInfo) {
+                    if (sender.contains(phoneInfo)) { //발신자 전화번호가 해당 카드사의 전화번호와 일치하면 log를 출력
+                        Log.d(TAG, "발신자 번호: " + phoneInfo);
+                        return true;
+                    }
                 }
             }
         }
         return false;
-    };
+    }
 
-    /* 메시지 내용 검사하는 함수(공공기관 사칭 메시지 등) */
-    public int checkSafeContent(String content, String sender, String targetPhone){
+    /* 메시지 내용이 안전한지 검사하는 함수 */
+    public int checkSafeContent(String sender,String content, String targetPhone){
         int danger = 0;
         if(contentTest1(content)){ danger += 1; }
         if(contentTest2(content)){ danger += 1; }
-
-        // 카드사가 포함된 문자 모두 거름
-        //if(isNormalCardMsg(content, targetPhone)) { danger += 1; }
-
+        if(!isNormalCardPhone(sender, content)) {danger += 1;}
         return danger;
     }
 

@@ -1,34 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnWhiteList"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="제외 목록 관리"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="137dp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/btnWhiteList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="제외 목록 관리" />
 
-    <Button
-        android:id="@+id/btnLogList"
+        <Button
+            android:id="@+id/btnLogList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="로그 보기" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="로그 보기"
-        app:layout_constraintTop_toBottomOf="@+id/btnWhiteList"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="2"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnStartService"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnStartService"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="서비스 켜기" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="서비스 켜기"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnWhiteList" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="4"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnSensitive0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="초" />
+        <Button
+            android:id="@+id/btnSensitive1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="노" />
+        <Button
+            android:id="@+id/btnSensitive2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="빨" />
+    </LinearLayout>
+</LinearLayout>
