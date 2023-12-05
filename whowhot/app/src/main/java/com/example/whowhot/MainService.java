@@ -1,5 +1,7 @@
 package com.example.whowhot;
 
+import static java.lang.String.format;
+
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -21,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -294,6 +298,7 @@ public class MainService extends Service {
     /* 메시지 위험도 검사하고 알림 */
     private void checkMessageAndNotify(Context context, String[] message) {
         int danger = 0; // 위험도
+        int type = 0;   // 문자 유형
         String sender = message[0]; // 발신자
         String content = message[1]; // 메시지 내용
 
@@ -307,6 +312,24 @@ public class MainService extends Service {
             }
             else{   // 안전한 URL이 아니면
                 danger += advancedURLTest(targetURL);   // 추가 검사하고 위험도 추가
+                String txt = ""; // 로그에 넣을 스트링
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.getDefault());
+                String time = sdf.format (System.currentTimeMillis());
+                Log.d("Test", time);
+                txt += time + "\\";
+                txt += sender + "\\";
+
+                String str_type = "default";
+                switch (type){
+                    case 0: str_type = "0"; break;
+                    case 1: str_type = "1"; break;
+                    case 2: str_type = "2"; break;
+                    case 3: str_type = "3"; break;
+                    case 4: str_type = "4"; break;
+                }
+                txt += str_type;
+
+                //appendToLogFile(txt,"log.txt"); // 로그에 추가 "날짜시간\발신자\유형"
             }
         }
 
@@ -338,7 +361,8 @@ public class MainService extends Service {
         }
     }
 
-    private void appendToFile(String addText, String fileName){ //리스트뷰의 리스트들을 파일에 저장하는 함수
+    /* log 저장하는 함수 */
+    private void appendToLogFile(String addText, String fileName){ //리스트뷰의 리스트들을 파일에 저장하는 함수
         File file = new File(getFilesDir(), fileName);
         FileWriter fileWriter = null;
 
@@ -349,7 +373,7 @@ public class MainService extends Service {
         Log.d(TAG, "Append");
         try { //open file
             fileWriter = new FileWriter(file, true);
-            fileWriter.write(addText+"\n");
+            fileWriter.write(addText);
             fileWriter.flush();
             Log.d(TAG, file.getAbsolutePath()+"에 저장");
 
