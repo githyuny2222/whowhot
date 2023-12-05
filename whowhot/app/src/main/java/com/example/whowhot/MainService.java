@@ -212,11 +212,15 @@ public class MainService extends Service {
     }
 
     /* 메시지 내용이 안전한지 검사하는 함수 */
-    public int checkSafeContent(String sender,String content, String targetPhone){
+    public int checkSafeContent(String sender, String content, String targetPhone, String type){
         int danger = 0;
         if(contentTest1(content)){ danger += 1; }
         if(contentTest2(content)){ danger += 1; }
-        if(!isNormalCardPhone(sender, content)) {danger += 1;}
+
+        if(!isNormalCardPhone(sender, content)) {
+            danger += 1;
+            type = "CA";
+        }
         return danger;
     }
 
@@ -263,26 +267,28 @@ public class MainService extends Service {
     }
 
     /* 추가 검사, 위험도 리턴 */
-    public int advancedURLTest(String targetURL){
+    public int advancedURLTest(String targetURL, String type){
         int danger = 0;
 
         // Virus Total 발견되었을 때 위험도 1점 추가
         if(checkVirusTotal(targetURL) > 0){
             Log.d(TAG, "checkVirusTotal : 걸림");
             danger += 1;
+            type = "VT";
         }
 
         // 정상 도메인이 발견되지 않았을 때 위험도 1점 추가
         if(!isNormalDomain(targetURL, domainFilter)){
             Log.d(TAG, "checkDaminForm : 걸림");
             danger += 1;
+            type = "DO";
         }
 
         return danger;
     }
 
     /* 위험도 받아서 경고 다이얼로그 출력하는 함수 */
-    public void notify(Context context, int danger, String phoneNumber, String targetURL){
+    public void notify(Context context, int danger, String phoneNumber, String targetURL, String type){
         if (danger == 0) {
             Log.d(TAG, "위험도 0 : 가벼운 경고");
             Toast.makeText(context.getApplicationContext(), "경고경고", Toast.LENGTH_LONG).show();
@@ -291,7 +297,7 @@ public class MainService extends Service {
             callDialog(context, danger); // Dialog호출
 
             /* DB에 추가 */
-            UrlData url = new UrlData(danger, targetURL);
+            UrlData url = new UrlData(danger, targetURL, type);
             addToDB(phoneNumber, url);
         }
     }
@@ -299,7 +305,7 @@ public class MainService extends Service {
     /* 메시지 위험도 검사하고 알림 */
     private void checkMessageAndNotify(Context context, String[] message) {
         int danger = 0; // 위험도
-        int type = 0;   // 문자 유형
+        String type = "";   // 메시지 유형
         String sender = message[0]; // 발신자
         String content = message[1]; // 메시지 내용
 
@@ -307,29 +313,20 @@ public class MainService extends Service {
         String targetURL = parseURL(content); // 메시지 내용에서 URL 추출
         Log.d(TAG, "targetURL : " + targetURL);
         if(!targetURL.equals("")) { // 메시지에 URL이 존재할때
-            if (isSafeURL(context, targetURL)) { // 안전한 URL이면
+            if (isSafeURL(context, targetURL)) { // 안전한 URL이면(Whitelist, Blacklist 판별)
                 Log.d(TAG, "안전한 URL");
                 return;
             }
             else{   // 안전한 URL이 아니면
-                danger += advancedURLTest(targetURL);   // 추가 검사하고 위험도 추가
+                danger += advancedURLTest(targetURL, type);   // 추가 검사하고 위험도 추가
+
                 String txt = ""; // 로그에 넣을 스트링
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.getDefault());
                 String time = sdf.format (System.currentTimeMillis());
                 Log.d("Test", time);
                 txt += time + "\\";
                 txt += sender + "\\";
-
-                String str_type = "default";
-                switch (type){
-                    case 0: str_type = "0"; break;
-                    case 1: str_type = "1"; break;
-                    case 2: str_type = "2"; break;
-                    case 3: str_type = "3"; break;
-                    case 4: str_type = "4"; break;
-                }
-                txt += str_type;
-
+                txt += type;
                 //appendToLogFile(txt,"log.txt"); // 로그에 추가 "날짜시간\발신자\유형"
             }
         }
@@ -337,10 +334,10 @@ public class MainService extends Service {
         /* 메시지 내용 검사 */
         String targetPhone = parsePhone(content);
         Log.d(TAG,"Phone Num: " + targetPhone);
-        danger += checkSafeContent(content, sender, targetPhone);
+        danger += checkSafeContent(content, sender, targetPhone, type);
 
-        /* 위험도에 따라 사용자에게 알림 */
-        notify(context, danger, sender, targetURL);
+        /* 위험도에 따라 사용자에게 알리고 DB에 추가 */
+        notify(context, danger, sender, targetURL, type);
     }
 
 

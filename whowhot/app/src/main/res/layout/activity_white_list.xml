@@ -1,5 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,71 +7,70 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#E2F0D9"
         android:orientation="vertical">
-
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-            <TextView
-                android:id="@+id/txtview0"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=" 제외목록 추가 혹은 제거"
-                android:textSize="27dp"/>
-            <TextView
-                android:id="@+id/txtview1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:background="#FAF027"
-                android:textColor="#595454"
-                android:text="자주 접속되는 사이트는\n탐지 대상에서 제외돼요\n\n추가하거나 제거할 수 있어요"
-                android:textSize="25dp"/>
-        </LinearLayout>
-
+        <!-- 화이트리스트 뷰 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="9"
             android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/edit0"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="추가 할 URL을 입력하세요"/>
+                android:background="#C5E0B4"
+                android:text="탐지 예외 URL 리스트"
+                android:textSize="27dp" />
 
             <ListView
                 android:id="@+id/whitelist"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="600dp"
+                android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:choiceMode="singleChoice" />
+
         </LinearLayout>
 
+        <!-- 화이트리스트 입력칸 & 버튼 -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="20dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:background="#C5E0B4"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnReturn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <EditText
+                android:id="@+id/edit0"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white"
+                android:hint="  추가 할 URL을 입력하세요"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="메인으로 돌아가기" />
-            <Button
-                android:id="@+id/btnAdd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="항목 추가" />
-            <Button
-                android:id="@+id/btnDel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="항목 삭제"/>
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnReturn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="메인으로 돌아가기" />
+                <Button
+                    android:id="@+id/btnAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="항목 추가" />
+                <Button
+                    android:id="@+id/btnDel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="항목 삭제"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

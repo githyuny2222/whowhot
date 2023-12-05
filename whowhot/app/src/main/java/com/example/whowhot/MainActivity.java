@@ -6,20 +6,28 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private Intent serviceIntent;
-    private Button btnWhiteList, btnLogList, btnStartBaseService;
+    private Button btnWhiteList, btnLogList, btnStartBaseService, btnHelp;
+    private TextView txtOnOff;
 
     private static final String TAG = "TEST_MAIN";   // Log용 태그
 
@@ -33,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         btnWhiteList = (Button)findViewById(R.id.btnWhiteList);
         btnLogList = (Button)findViewById(R.id.btnLogList);
         btnStartBaseService = (Button)findViewById(R.id.btnStartService);
+        btnHelp = (Button)findViewById(R.id.btn_info) ;
+        txtOnOff = (TextView)findViewById(R.id.txt_onoff);
 
         // 퍼미션 받기
         permissionCheck();
@@ -61,14 +71,39 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(BaseService.isServiceRunning(getApplicationContext())) {
                     stopBaseService();
-                    btnStartBaseService.setText("서비스 켜기");
+                    txtOnOff.setText("실시간 탐지 OFF");
                 }
                 else{
                     startBaseService();
-                    btnStartBaseService.setText("서비스 끄기");
+                    txtOnOff.setText("실시간 탐지 ON");
                 }
             }
         });
+    }
+
+    // ? 버튼
+    public void onHelpClick(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String str = "모두 : 스미싱 의심/위험 메시지를 탐지해요\n일부 : 스미싱 위험 메시지만 탐지해요\n안함 : 스미싱을 탐지하지 않아요";
+        SpannableStringBuilder ssb = new SpannableStringBuilder(str);
+        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#5F00FF")), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#FF1414")), 12, 14, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#FF1414")), 34, 36, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#1BAA0B")), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#DDBB44")), 25, 27, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#FF1414")), 47, 49, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.setTitle("탐지 범위 설정이란?").setMessage(ssb);
+
+        builder.setPositiveButton("알겠어요!", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int id)
+            {
+                //Log.d(TAG, "알겠어요!");
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -117,3 +152,4 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
+
