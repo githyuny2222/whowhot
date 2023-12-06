@@ -1,78 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#E2F0D9"
     tools:context=".DetailActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E2F0D9"
-        android:orientation="vertical">
-        <!-- 실시간 스미싱 탐지 로그 -->
-        <LinearLayout
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="2"
+        android:layout_marginTop="2dp">
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="9"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#C5E0B4"
-                android:text="실시간 스미싱 탐지 로그"
-                android:textSize="27dp" />
-
-            <ListView
-                android:id="@+id/logListView"
-                android:layout_width="match_parent"
-                android:layout_height="660dp"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:choiceMode="singleChoice"
-                app:layout_constraintTop_toTopOf="parent" />
-        </LinearLayout>
-
-        <!-- 텍스트 입력칸 & 버튼 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
             android:layout_weight="1"
             android:background="#C5E0B4"
-            android:orientation="vertical">
-            <EditText
-                android:id="@+id/edit0"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@color/white"
-                android:hint=" 로그 테스트용 "/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/btnReturn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="메인으로 돌아가기" />
-                <Button
-                    android:id="@+id/btnAdd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="항목 추가" />
-                <Button
-                    android:id="@+id/btnDel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="항목 삭제"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
+            android:text=" 탐지 기록"
+            android:textColor="@color/black"
+            android:textSize="27dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#C5E0B4"
+            android:text=" 스미싱 탐지의 정확한 결과를 볼 수 있어요."
+            android:textSize="22dp"
+            android:textColor="#042507"/>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="10">
+
+        <ListView
+            android:id="@+id/logListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:choiceMode="singleChoice" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="1">
+        <Button
+            android:id="@+id/btnReturn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="돌아가기"
+            android:textColor="@color/black"
+            android:textSize="23dp"/>
+        <Button
+            android:id="@+id/btnDel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="로그 지우기"
+            android:textColor="@color/black"
+            android:textSize="23dp"
+            android:onClick="onClickDelete"/>
+    </LinearLayout>
+</LinearLayout>

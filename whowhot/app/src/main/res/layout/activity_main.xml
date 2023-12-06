@@ -66,7 +66,7 @@
                     android:layout_width="35dp"
                     android:layout_height="40dp"
                     android:text="\?"
-                    android:onClick="onHelpClick"/>
+                    android:onClick="onClickHelp"/>
                 <TextView
                     android:id="@+id/txt_blank0"
                     android:layout_width="wrap_content"
@@ -86,8 +86,8 @@
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="3dp">
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp">
 
                     <TextView
                         android:id="@+id/txt_sens0"
@@ -138,36 +138,30 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#E2F0D9"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:background="#E2F0D9">
 
-            <LinearLayout
+            <Button
+                android:id="@+id/btnWhiteList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_marginBottom="10dp">
+                android:layout_height="52dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="탐지 제외 목록"
+                android:textSize="23dp"
+                android:textColor="@color/black"/>
 
-                <Button
-                    android:id="@+id/btnWhiteList"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:text="탐지 제외 목록"
-                    android:textSize="23dp"
-                    android:textColor="@color/black"/>
+            <Button
+                android:id="@+id/btnLogList"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="탐지 기록"
+                android:textSize="23dp"
+                android:textColor="@color/black" />
 
-                <Button
-                    android:id="@+id/btnLogList"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:text="탐지 기록"
-                    android:textSize="23dp"
-                    android:textColor="@color/black" />
-
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

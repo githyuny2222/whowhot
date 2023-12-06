@@ -13,8 +13,8 @@
 
     <!-- 크기 -->
     <size
-        android:width="13dp"
-        android:height="13dp" />
+        android:width="30dp"
+        android:height="30dp" />
 
 
 </shape>

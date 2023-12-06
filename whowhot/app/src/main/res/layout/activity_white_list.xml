@@ -14,13 +14,36 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="9"
+            android:layout_marginTop="2dp"
             android:orientation="vertical">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#C5E0B4"
-                android:text="탐지 예외 URL 리스트"
-                android:textSize="27dp" />
+                android:text=" 제외대상 추가 혹은 제거"
+                android:textSize="27dp"
+                android:textColor="@color/black"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=""
+                android:textSize="10dp"
+                android:textColor="#1B3C07"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=" 실시간 스미싱 탐지에서 제외할 URL을\n 추가하거나 제거할 수 있어요."
+                android:textSize="20dp"
+                android:textColor="#1B3C07"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=""
+                android:textSize="10dp"
+                android:textColor="#1B3C07"/>
 
             <ListView
                 android:id="@+id/whitelist"

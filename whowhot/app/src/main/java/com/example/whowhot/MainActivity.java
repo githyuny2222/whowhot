@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,9 +18,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private Intent serviceIntent;
@@ -46,6 +41,13 @@ public class MainActivity extends AppCompatActivity {
 
         // 퍼미션 받기
         permissionCheck();
+
+        if(BaseService.isServiceRunning(getApplicationContext())) {
+            txtOnOff.setText("실시간 탐지 ON");
+        }
+        else{
+            txtOnOff.setText("실시간 탐지 OFF");
+        }
 
         /* 버튼 클릭하면 화이트리스트 액티비티 불러옴 */
         btnWhiteList.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ? 버튼
-    public void onHelpClick(View view) {
+    public void onClickHelp(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String str = "모두 : 스미싱 의심/위험 메시지를 탐지해요\n일부 : 스미싱 위험 메시지만 탐지해요\n안함 : 스미싱을 탐지하지 않아요";
         SpannableStringBuilder ssb = new SpannableStringBuilder(str);

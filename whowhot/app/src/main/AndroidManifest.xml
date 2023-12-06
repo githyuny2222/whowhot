@@ -66,7 +66,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AlertDialog"
+            android:name=".MyDialog"
             android:enabled="true"
             android:exported="true"
             android:launchMode="singleInstance"

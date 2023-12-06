@@ -152,7 +152,8 @@ public class WhiteListActivity extends Activity {
         }
     }
 
-    private void loadWhiteListFromFile(){ //파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시
+    /* 파일로부터 줄 단위로 텍스트를 읽어오고, 리스트뷰에 표시 */
+    private void loadWhiteListFromFile(){
         Log.d(TAG, "loadWhiteList");
         File file = new File(getFilesDir(), fileName);
         FileReader fr = null;
@@ -182,6 +183,7 @@ public class WhiteListActivity extends Activity {
         }
     }
 
+    /* 화이트리스트를 자주 접속되는 사이트로 채워넣는 함수 */
     public void fillWhiteList(){
         Log.d(TAG, "fillWhiteList");
         File file = new File(getFilesDir(), fileName);
