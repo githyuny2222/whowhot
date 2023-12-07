@@ -1,7 +1,5 @@
 package com.example.whowhot;
 
-import static java.lang.String.format;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,10 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class MainService extends Service {
     /* 탐지 유형별 Code */
@@ -48,7 +43,6 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStart Main Service");
-        final String targetURL = "www.example.com";
 
         // 브로드캐스트 리시버에서 메시지 받음
         String[] msgs = intent.getStringArrayExtra("msgs");
@@ -122,7 +116,7 @@ public class MainService extends Service {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     UrlData urlData = snapshot.getValue(UrlData.class);
                     String currURL = urlData.getURL();
-                    Log.d(TAG, "currURL : " + currURL);
+                    //Log.d(TAG, "currURL : " + currURL);
 
                     //비교
                     if(currURL.equals(targetURL)){
@@ -263,7 +257,7 @@ public class MainService extends Service {
         if (danger == 0) {
             Log.d(TAG, "위험도 0");
         } else {   // 위험도가 1보다 클때
-            Log.d(TAG, "위험도 1 : Dialog 호출");
+            Log.d(TAG, "위험도 1이상 : Dialog 호출");
             MyDialog dialog = new MyDialog();
             dialog.callDialog(context, danger); // Dialog호출
         }

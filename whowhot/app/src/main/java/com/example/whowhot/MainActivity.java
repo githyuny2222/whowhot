@@ -17,12 +17,20 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class MainActivity extends AppCompatActivity {
     private Intent serviceIntent;
     private Button btnWhiteList, btnLogList, btnStartBaseService, btnHelp;
     private TextView txtOnOff;
+    private SeekBar seekBar;
+    private static final String configFileName = "config.txt";
 
     private static final String TAG = "TEST_MAIN";   // Log용 태그
 
@@ -38,16 +46,38 @@ public class MainActivity extends AppCompatActivity {
         btnStartBaseService = (Button)findViewById(R.id.btnStartService);
         btnHelp = (Button)findViewById(R.id.btn_info) ;
         txtOnOff = (TextView)findViewById(R.id.txt_onoff);
+        seekBar = (SeekBar)findViewById(R.id.seekBar1);
 
         // 퍼미션 받기
         permissionCheck();
 
         if(BaseService.isServiceRunning(getApplicationContext())) {
             txtOnOff.setText("실시간 탐지 ON");
+            btnStartBaseService.setForeground(getResources().getDrawable(R.drawable.on,null));
+            configload();
         }
         else{
             txtOnOff.setText("실시간 탐지 OFF");
+            btnStartBaseService.setForeground(getResources().getDrawable(R.drawable.off,null));
+            configload();
         }
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // 시크바를 조작하고 있는 중
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // 시크바를 처음 터치했을 때
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                configset(seekBar.getProgress());
+            }
+        });
 
         /* 버튼 클릭하면 화이트리스트 액티비티 불러옴 */
         btnWhiteList.setOnClickListener(new View.OnClickListener() {
@@ -74,10 +104,12 @@ public class MainActivity extends AppCompatActivity {
                 if(BaseService.isServiceRunning(getApplicationContext())) {
                     stopBaseService();
                     txtOnOff.setText("실시간 탐지 OFF");
+                    btnStartBaseService.setForeground(getResources().getDrawable(R.drawable.off,null));
                 }
                 else{
                     startBaseService();
                     txtOnOff.setText("실시간 탐지 ON");
+                    btnStartBaseService.setForeground(getResources().getDrawable(R.drawable.on,null));
                 }
             }
         });
@@ -107,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
 
     @Override
     protected void onDestroy() {
@@ -153,5 +186,67 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-}
 
+    private void appendToconfigFile(String addText){ // 파일에 로그 저장
+        File file = new File(getFilesDir(), configFileName);
+        FileWriter fileWriter = null;
+
+        try { //open file
+            fileWriter = new FileWriter(file, false);
+            fileWriter.write(addText);
+            fileWriter.flush();
+            Log.d(TAG, file.getAbsolutePath()+"에 저장");
+
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(TAG, "FILE OPEN ERROR : "+e);
+        }
+
+        try { //close file
+            if (fileWriter != null){
+                fileWriter.close();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(TAG, "FILE CLOSE ERROR : "+e);
+        }
+    }
+
+    /* 컨피그 저장하는 함수 */
+    private void configset(int seekset){
+        String logStr = "config : " + seekset; // 추가할 log
+        appendToconfigFile(logStr); // 로그에 추가 "날짜시간\발신자\유형"
+        Log.d(TAG, "configset : 컨피그 설정 완료 " + seekset);
+    }
+
+    /* 컨피그를 읽어와서 시크바 설정하는 함수 */
+    private void configload(){
+        File file = new File(getFilesDir(), configFileName);
+        FileReader fr = null;
+        BufferedReader bufrd = null;
+        String str = null;
+        String readStr = "";
+        int i = 0;
+
+        if (file.exists()) { // 파일이 존재하면
+            try { //open file
+                fr = new FileReader(file);
+                bufrd = new BufferedReader(fr);
+
+                while ((str = bufrd.readLine()) != null){   // 파일 한줄씩 읽음
+                    readStr += str + "\n";
+                }
+                // 파일 닫음
+                bufrd.close();
+                fr.close();
+                // 숫자만 추출해줌
+                int intStr = Integer.valueOf(readStr.replaceAll("[^0-9]", ""));
+                seekBar.setProgress(intStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "FILE OPEN ERROR : " + e);
+            }
+        }
+    }
+
+}

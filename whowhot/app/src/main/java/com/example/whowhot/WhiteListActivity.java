@@ -27,7 +27,7 @@ public class WhiteListActivity extends Activity {
     private static final String[] defaultWhitelist = {"youtube.com", "google.com", "naver.com",
             "namu.wiki", "dcinside.com", "tistory.com",
             "coupang.com", "daum.net", "twitch.tv", "fmkorea.com",
-            "inven.co.kr", "arca.live", "kakao.com", "google.co.kr",
+            "inven.co.kr", "arca.live", "google.co.kr",
             "nexon.com", "instagram.com", "aliexpress.com", "ruliweb.com",
             "afreecatv.com", "twitter.com" };   // 화이트리스트에 2023년 가장 많이 접속된 사이트 top 20 기본 추가
 
