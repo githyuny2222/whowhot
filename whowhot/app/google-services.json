@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "87302437029",
+    "project_id": "whowhot-26cde",
+    "storage_bucket": "whowhot-26cde.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:87302437029:android:47cd001106fc518c2ab54c",
+        "android_client_info": {
+          "package_name": "com.example.whowhot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNLySm0vqDjv3JTM2hN9Rf6vn6tp58lZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

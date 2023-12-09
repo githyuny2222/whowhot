@@ -1,0 +1,101 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E2F0D9"
+        android:orientation="vertical">
+        <!-- 화이트리스트 뷰 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            android:layout_marginTop="2dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=" 제외대상 추가 혹은 제거"
+                android:textSize="27dp"
+                android:textColor="@color/black"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=""
+                android:textSize="10dp"
+                android:textColor="#1B3C07"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=" 실시간 스미싱 탐지에서 제외할 URL을\n 추가하거나 제거할 수 있어요."
+                android:textSize="20dp"
+                android:textColor="#1B3C07"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#C5E0B4"
+                android:text=""
+                android:textSize="10dp"
+                android:textColor="#1B3C07"/>
+
+            <ListView
+                android:id="@+id/whitelist"
+                android:layout_width="match_parent"
+                android:layout_height="600dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:choiceMode="singleChoice" />
+
+        </LinearLayout>
+
+        <!-- 화이트리스트 입력칸 & 버튼 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_weight="1"
+            android:background="#C5E0B4"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edit0"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white"
+                android:hint="  추가 할 URL을 입력하세요"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnReturn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="메인으로 돌아가기" />
+                <Button
+                    android:id="@+id/btnAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="항목 추가" />
+                <Button
+                    android:id="@+id/btnDel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="항목 삭제"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
