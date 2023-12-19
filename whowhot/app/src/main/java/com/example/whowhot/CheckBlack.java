@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 
+import java.util.Arrays;
+
 public class CheckBlack {
     private static final String TAG = "TEST_CHECK_BLACK";
     private boolean isBlack;
@@ -16,21 +18,21 @@ public class CheckBlack {
         this.isBlack = isBlack;
     }
 
-    public boolean check(DataSnapshot dataSnapshot, String targetURL){
+    public int check(DataSnapshot dataSnapshot, String targetURL){
         Log.d(TAG, "check() function");
         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
             UrlData urlData = snapshot.getValue(UrlData.class);
             String currURL = urlData.getURL();
-            Log.d(TAG, "currURL : " + currURL);
+            //Log.d(TAG, "currURL : " + currURL);
 
             //비교
             if(currURL.equals(targetURL)){
                 Log.d(TAG, "발견! targetURL : " + targetURL);
-                return true;
+                return urlData.getType();
             }
         }
         Log.d(TAG, "발견 안됨! targetURL : " + targetURL);
-        return false;
+        return 0;
     }
 
     public boolean isBlack() {

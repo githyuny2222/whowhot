@@ -31,7 +31,9 @@ public class MainService extends Service {
     private static final String TAG = "TEST_MAIN_SERVICE";   // log용 태그
     private static final String logFileName = "log.txt";    // 로그 파일 이름
     private static final String whitelistFileName = "WhiteList.txt";    // 화이트리스트 파일 이름
-    private static final String[] domainFilter = {".com", ".net", ".kr", ".org", ".us", ".ng", ".biz", ".info"};    // 도메인 검사용
+    static final String configFileName = "config.txt";  // config 파일 불러오기용
+    private static final String[] domainFilter = {".com", ".net", ".kr", ".org", ".us", ".ng", ".biz", ".info", ".ws", ".info"};    // 도메인 검사용
+    private static final String[] keywordFilter = {"센Eㅓ", "K.T", "S.K", "L.G", "공매도", "수익약속", "국내주식", "외환거래", "L0TT0"};
 
     DatabaseManager databaseManager = new DatabaseManager("Data");
 
@@ -112,16 +114,22 @@ public class MainService extends Service {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
                 // 데이터 처리
-                boolean result_black = false;   // 블랙리스트인지 판단할 변수
+                int result_type_in_black = 0;   // 블랙리스트인지 판단할 변수
                 if(dataSnapshot != null) {  // DB에 아무것도 없으면 블랙리스트 아님
                     CheckBlack checkBlack = new CheckBlack();   // 블랙리스트 판별 클래스
-                    result_black = checkBlack.check(dataSnapshot, targetURL);  // 블랙리스트 검사해서 bool값 줌
-                    Log.d(TAG, "result_black : "+result_black);
+                    result_type_in_black = checkBlack.check(dataSnapshot, targetURL);  // 블랙리스트 검사해서 bool값 줌
+                    Log.d(TAG, "result_black : " + result_type_in_black);
                 }
-                if(result_black){
-                    Log.d(TAG, "블랙이니까 그냥 통과시킴");
+                if(result_type_in_black > 0){
+                    Log.d(TAG, "블랙일 경우 다이얼로그 호출하고 로깅");
+                    int danger = setDanger(result_type_in_black);
+                    callDialog(danger);
+                    logging(sender, result_type_in_black);
+                    onDestroy();
+                    //Log.e(TAG, "이게 실행이 될까? 그러면 안되는데");
                 }
                 else{
+                    Log.d(TAG, "블랙 아닐경우 추가 검사 시행하고 다음 검사로");
                     int type = advancedURLTest(targetURL);
                     testB_Sender(context, sender, content, type);
                 }
@@ -133,9 +141,6 @@ public class MainService extends Service {
                 System.out.println("Read data failed: " + databaseError.toException());
             }
         });
-    }
-    public void little_function(){
-        Log.d(TAG, "Test little function!");
     }
 
     /* VirusTotal 검사. 걸린 숫자 리턴 */
@@ -222,6 +227,7 @@ public class MainService extends Service {
 
         isBlack(context, sender, content, targetURL);
         //Log.d(TAG, "1.3 블랙리스트 검사 : 블랙리스트에 존재하는 URL");
+        Log.e(TAG, "이게 실행이 될까? 이건 실행되면 안됨");
         return 200; // isBlack()에서 빠져나오면 URL도 있고 white에도 없는 경우임
     }
 
@@ -242,17 +248,33 @@ public class MainService extends Service {
         targetPhone = parser.parsePhone(content); // 메시지에서 전화번호 파싱
         Log.d(TAG,"Phone Num: " + targetPhone);
 
+        // 키워드 필터 검사
+        for(String keyword : keywordFilter){
+            if(content.contains(keyword)){
+                type = KW;
+            }
+        }
+
         return type;
     }
 
+    /* 다이얼로그 호출하는 함수 */
+    public void callDialog(int danger){
+        int alert_config = getConfig();
+        Intent intent = new Intent(this, MyDialog.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("danger", danger);
+        intent.putExtra("alert_config", alert_config);
+        startActivity(intent);
+    }
+
     /* 위험도 받아서 경고 다이얼로그 출력하는 함수 */
-    public void alert(Context context, int danger){
+    public void alert(int danger){
         if (danger == 0) {
             Log.d(TAG, "위험도 0");
         } else {   // 위험도가 1보다 클때
             Log.d(TAG, "위험도 1이상 : Dialog 호출");
-            MyDialog dialog = new MyDialog();
-            dialog.callDialog(context, danger); // Dialog호출
+            callDialog(danger);
         }
     }
 
@@ -269,6 +291,7 @@ public class MainService extends Service {
             case DLV: danger=2; break;
             case VT: danger=2; break;
         }
+        Log.d(TAG, "type :" + type + ", danger : "+danger);
         return danger;
     }
 
@@ -285,7 +308,7 @@ public class MainService extends Service {
         int result_checkURL = checkURL(context, sender, content);
         if(result_checkURL == -1){ Log.d(TAG, "기본 URL판별 결과 : URL 발견되지 않음"); result_checkURL=0; }
         if(result_checkURL == WHITE){ Log.d(TAG, "기본 URL 판별 결과 : 화이트리스트에 있음"); return; }
-        if(result_checkURL == BLACK){ Log.d(TAG, "기본 URL 판별 결과 : 추가 검사 필요"); return; }
+        if(result_checkURL == BLACK){ Log.d(TAG, "기본 URL 판별 결과 : 블랙리스트에 있음"); return; }
         type = result_checkURL; // 화이트, 블랙 아니면 type 반환하고 sender검사
 
         // advanced test는 black에서 하니까 여기서는 -1인 경우만 있음
@@ -308,7 +331,7 @@ public class MainService extends Service {
             int result_checkContent = checkContent(content);
             if(type < result_checkContent){ // 발신자 검사 결과 걸렸을 경우
                 Log.d(TAG, "키워드 검사 : 걸림");
-                type = result_checkSender;
+                type = result_checkContent;
             }
             else{
                 Log.d(TAG, "키워드 검사 : 양호");
@@ -323,7 +346,7 @@ public class MainService extends Service {
         if(danger > 0){ addToDB(sender, content, danger, type); } // 위험도 0은 패스, 1,2는 저장
 
         /* 위험도에 따라 사용자에게 알림 */
-        alert(context, type);
+        alert(danger);
     }
 
     /* type 코드로 받아서 log에 저장할 String으로 변환 */
@@ -398,6 +421,36 @@ public class MainService extends Service {
         databaseManager.writeData(sender, urlData);
 
         Log.d(TAG, "[DB 추가] sender : " + sender + ", URL : " + url + ", danger : " + danger + ", type : " + type);
+    }
+
+    /* 컨피그를 읽어와서 alert_config 설정하는 함수 */
+    private int getConfig() {
+        File file = new File(getFilesDir(), configFileName);
+        FileReader fr = null;
+        BufferedReader bufrd = null;
+        String readStr = "";
+
+        if (file.exists()) { // 파일이 존재하면
+            try { //open file
+                fr = new FileReader(file);
+                bufrd = new BufferedReader(fr);
+
+                String str = "";
+                while ((str = bufrd.readLine()) != null) {   // 파일 한줄씩 읽음
+                    readStr += str + "\n";
+                }
+                // 파일 닫음
+                bufrd.close();
+                fr.close();
+                // 숫자만 추출해줌
+                int intStr = Integer.valueOf(readStr.replaceAll("[^0-9]", ""));
+                return intStr;
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "FILE OPEN ERROR : " + e);
+            }
+        }
+        return -1;
     }
 }
 
